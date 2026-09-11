@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Restaurant Portal — Admin + Staff</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>tailwind.config={theme:{extend:{colors:{ink:'#243040',paper:'#F6F7F9',surface:'#FFF',line:'#D9DEE5',brand:'#3B4BA8',placed:'#64748B',preparing:'#D98E04',ready:'#0E8A8A',served:'#2E7D4F',voided:'#B42318',attention:'#C2185B'},fontFamily:{sans:['Noto Sans','sans-serif']}}}}</script>
+<style>*{font-family:'Noto Sans',sans-serif} .tabular{font-variant-numeric:tabular-nums}</style>
+</head>
+<body class="bg-paper text-ink antialiased">
+<header class="sticky top-0 z-50 bg-surface border-b border-line">
+ <div class="max-w-[1400px] mx-auto px-4 h-[52px] flex items-center justify-between gap-3">
+  <div class="flex items-center gap-2"><div class="w-7 h-7 rounded-lg bg-brand grid place-items-center text-white font-bold text-xs">R</div><span class="font-bold">restaurant portal</span><span class="hidden sm:inline text-[11px] px-2 py-1 rounded-full bg-paper border border-line">Admin + Staff · HTML Prototype</span></div>
+  <div class="flex items-center gap-2"><span class="hidden md:inline text-xs text-ink/50">Login: owner / manager / waiter / kitchen</span><a href="customer.html" class="text-xs font-semibold border border-line px-3 py-1.5 rounded-full bg-paper">← Customer view</a></div>
+ </div>
+ <div class="border-t border-line bg-paper/60">
+  <div class="max-w-[1400px] mx-auto px-4 flex gap-1 overflow-x-auto py-2">
+   <button onclick="show('dashboard')" id="n-dashboard" class="nav px-4 py-2 rounded-full text-sm font-semibold bg-ink text-white whitespace-nowrap">Dashboard</button>
+   <button onclick="show('live')" id="n-live" class="nav px-4 py-2 rounded-full text-sm bg-surface border border-line whitespace-nowrap">Live Orders <span class="bg-attention text-white text-xs px-1.5 rounded-full">1</span></button>
+   <button onclick="show('billing')" id="n-billing" class="nav px-4 py-2 rounded-full text-sm bg-surface border border-line whitespace-nowrap">Billing</button>
+   <button onclick="show('total')" id="n-total" class="nav px-4 py-2 rounded-full text-sm bg-surface border border-line whitespace-nowrap">Total Orders</button>
+   <button onclick="show('menu')" id="n-menu" class="nav px-4 py-2 rounded-full text-sm bg-surface border border-line whitespace-nowrap">Menu</button>
+   <button onclick="show('tables')" id="n-tables" class="nav px-4 py-2 rounded-full text-sm bg-surface border border-line whitespace-nowrap">Tables & QR</button>
+   <button onclick="show('staff')" id="n-staff" class="nav px-4 py-2 rounded-full text-sm bg-surface border border-line whitespace-nowrap">Staff</button>
+   <button onclick="show('settings')" id="n-settings" class="nav px-4 py-2 rounded-full text-sm bg-surface border border-line whitespace-nowrap">Settings</button>
+  </div>
+ </div>
+</header>
+
+<!-- DASHBOARD -->
+<section id="s-dashboard" class="page max-w-[1400px] mx-auto px-4 py-4 space-y-4">
+ <div class="grid grid-cols-2 xl:grid-cols-4 gap-3">
+  <div class="rounded-2xl bg-surface border border-line p-4"><div class="text-xs text-ink/50">Today's sales · business day 04:00</div><div class="text-2xl font-bold tabular">₹18,420</div><div class="text-xs text-served">12 bills · avg ₹1,535</div></div>
+  <div class="rounded-2xl bg-surface border border-line p-4"><div class="text-xs text-ink/50">Open tables</div><div class="text-2xl font-bold">5 / 12</div><div class="text-xs">3 need attention</div></div>
+  <div class="rounded-2xl bg-surface border border-line p-4"><div class="text-xs text-ink/50">Items in progress</div><div class="text-2xl font-bold">8</div><div class="text-xs">2 ready to serve</div></div>
+  <div class="rounded-2xl bg-brand text-white p-4"><div class="text-xs opacity-80">Demo Kitchen · owner</div><div class="font-bold">Growth — Trial 9d left</div><div class="text-xs opacity-80">Choose plan →</div></div>
+ </div>
+
+ <!-- STAFF BOARD embedded in dashboard -->
+ <div class="rounded-2xl bg-surface border border-line p-4">
+  <div class="flex justify-between items-center mb-3"><h3 class="font-bold">Live Board — Staff View (tablet)</h3><span class="text-xs px-2 py-1 rounded-full bg-served text-white">● Live · Realtime</span></div>
+  <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
+   <div onclick="show('live')" class="cursor-pointer rounded-2xl border-2 border-attention p-3 space-y-1"><div class="flex justify-between"><span class="text-xl font-bold">T5</span><span class="text-[11px] px-2 py-1 rounded-full bg-attention text-white">Needs approval</span></div><div class="text-xs text-ink/60">18 min · 4 items</div><div class="text-xs font-semibold text-attention">Tap → approve</div></div>
+   <div class="rounded-2xl border-l-[6px] border-preparing bg-paper p-3"><div class="flex justify-between"><span class="font-bold">T2</span><span class="text-[11px] px-2 py-1 bg-preparing text-white rounded-full">Preparing</span></div><div class="text-xs">Paneer Tikka</div></div>
+   <div class="rounded-2xl border-l-[6px] border-ready bg-paper p-3"><div class="flex justify-between"><span class="font-bold">T7</span><span class="text-[11px] px-2 py-1 bg-ready text-white rounded-full">Ready</span></div><div class="text-xs">Ready to serve</div></div>
+   <div class="rounded-2xl border border-line p-3 opacity-60"><div class="font-bold">T1</div><div class="text-xs">Free</div></div>
+   <div class="rounded-2xl border border-line p-3 opacity-60"><div class="font-bold">T3</div><div class="text-xs">Free</div></div>
+   <div class="rounded-2xl border border-line p-3 opacity-60"><div class="font-bold">T4</div><div class="text-xs">Free</div></div>
+  </div>
+  <div class="mt-4 grid lg:grid-cols-3 gap-3 text-xs">
+   <div class="rounded-xl bg-paper border border-line p-3"><b>New</b><div class="mt-1 bg-surface border-l-4 border-placed p-2 rounded">T5 · Paneer ×1 · 18m</div></div>
+   <div class="rounded-xl bg-paper border border-line p-3"><b>Preparing</b><div class="mt-1 bg-surface border-l-4 border-preparing p-2 rounded">T2 · Biryani Full ×1</div></div>
+   <div class="rounded-xl bg-paper border border-line p-3"><b>Ready</b><div class="mt-1 bg-surface border-l-4 border-ready p-2 rounded">T7 · Naan ×4</div></div>
+  </div>
+ </div>
+</section>
+
+<!-- LIVE -->
+<section id="s-live" class="page hidden max-w-[1400px] mx-auto px-4 py-4 space-y-4">
+ <div class="flex gap-2"><span class="px-3 py-1.5 rounded-full bg-ink text-white text-sm">All</span><span class="px-3 py-1.5 rounded-full bg-surface border border-line text-sm">Needs approval 1</span><span class="px-3 py-1.5 rounded-full bg-surface border border-line text-sm">In progress</span></div>
+ <div class="rounded-2xl bg-surface border border-line p-4 space-y-3">
+  <h3 class="font-bold">Table T5 — Drawer (waiter / manager)</h3>
+  <div class="rounded-xl border-2 border-attention bg-attention/5 p-3 text-sm"><div class="font-bold text-attention">Round 1 · Pending approval</div><div class="text-xs">Paneer Tikka ×1, Butter Naan ×3 — customer device …a8Kx</div><div class="flex gap-2 mt-2"><button onclick="toast('Approved — session open')" class="flex-1 py-2 rounded-full bg-served text-white font-bold">Approve</button><button class="flex-1 py-2 rounded-full border border-line bg-surface">Reject (reason)</button></div></div>
+  <div class="rounded-xl border border-line p-3 text-sm"><div class="flex justify-between"><b>Round 2 — Accepted</b><span class="text-xs px-2 py-1 rounded-full bg-ready text-white">Ready</span></div><div class="flex justify-between mt-2"><span>Chicken Biryani (Full) ×1</span><button onclick="toast('Marked Served — colour → green')" class="text-xs bg-ink text-white px-3 py-1.5 rounded-full">Mark served</button></div><div class="flex gap-2 mt-2"><button class="flex-1 text-xs border border-line py-2 rounded-full">Revert status (manager)</button><button onclick="toast('Removed — reason: Out of stock — struck through')" class="flex-1 text-xs border border-voided text-voided py-2 rounded-full">Remove item (reason)</button></div></div>
+  <button onclick="toast('Add order — staff picker')" class="w-full py-3 rounded-xl bg-brand text-white font-bold">+ Add order (waiter)</button>
+ </div>
+ <div class="rounded-2xl bg-surface border border-line p-4">
+  <h3 class="font-bold">Availability — toggles (kitchen can flip)</h3>
+  <div class="mt-2 grid sm:grid-cols-2 gap-2 text-sm"><label class="flex justify-between items-center border border-line rounded-xl px-3 py-2 bg-paper"><span>Dal Makhani</span><input type="checkbox"> Out of stock</label><label class="flex justify-between items-center border border-line rounded-xl px-3 py-2 bg-paper"><span>Paneer Tikka</span><input type="checkbox" checked> In stock</label></div>
+ </div>
+</section>
+
+<!-- BILLING -->
+<section id="s-billing" class="page hidden max-w-[1400px] mx-auto px-4 py-4 space-y-4">
+ <div class="rounded-2xl bg-surface border border-line overflow-hidden">
+  <div class="px-4 py-3 border-b border-line flex justify-between"><h3 class="font-bold">Billing — Open sessions</h3><span class="text-xs px-2 py-1 rounded-full bg-paper border border-line">Pending blocks billing</span></div>
+  <div class="divide-y divide-line">
+   <div class="p-3 flex justify-between items-center"><span class="text-sm"><b>T5</b> · 2 rounds · ₹860 · <span class="text-xs bg-attention text-white px-2 py-1 rounded-full">Pending approval</span></span><span class="text-xs text-ink/50">Approve first</span></div>
+   <div class="p-3 flex justify-between items-center bg-paper/30"><span class="text-sm"><b>T2</b> · 3 items · ₹700 · <span class="text-xs bg-ready text-white px-2 py-1 rounded-full">Ready</span></span><button onclick="document.getElementById('builder').classList.remove('hidden');document.getElementById('builder').scrollIntoView({behavior:'smooth'})" class="text-sm bg-ink text-white px-4 py-2 rounded-full font-semibold">Generate bill →</button></div>
+  </div>
+  <div id="builder" class="hidden border-t-2 border-ink p-4 bg-paper space-y-3">
+   <h4 class="font-bold">Bill builder — T2 · admin_preview_bill</h4>
+   <div class="grid md:grid-cols-2 gap-4">
+    <div class="bg-surface border border-line rounded-xl p-3 text-sm space-y-1"><div class="flex justify-between"><span>Paneer Tikka ×1</span><span class="tabular">₹280</span></div><div class="flex justify-between"><span>Butter Naan ×3</span><span class="tabular">₹180</span></div><div class="flex justify-between"><span>Dal Makhani ×1</span><span class="tabular">₹240</span></div><div class="border-t border-line pt-2 flex justify-between font-bold"><span>Subtotal</span><span class="tabular">₹700</span></div></div>
+    <div class="space-y-3">
+     <div class="flex gap-2 text-sm"><select class="border border-line rounded-full px-3 py-2 bg-surface"><option>Discount: none</option><option>10% — Staff</option><option>Flat ₹100</option></select><label class="flex items-center gap-1 text-xs"><input type="checkbox" checked> Service 5%</label></div>
+     <div class="bg-surface border border-line rounded-xl p-3 text-sm space-y-1"><div class="flex justify-between"><span>Discount</span><span class="tabular">-₹70</span></div><div class="flex justify-between"><span>Service 5%</span><span class="tabular">+₹31</span></div><div class="flex justify-between"><span>CGST/SGST 2.5% each</span><span class="tabular">₹33</span></div><div class="flex justify-between font-bold text-base border-t border-line pt-2"><span>Grand total</span><span class="tabular">₹695</span></div><div class="text-[11px] text-ink/50">Round off +₹42 · FY 2026-27 · INV/2026-27/00042</div></div>
+     <div class="flex gap-2"><button onclick="toast('Bill INV/2026-27/00042 generated — table freed')" class="flex-1 py-3 rounded-xl bg-brand text-white font-bold">Generate bill</button><button class="px-4 py-3 rounded-xl border border-line bg-surface">Void / Reopen (30m)</button></div>
+    </div>
+   </div>
+  </div>
+ </div>
+ <div class="rounded-2xl bg-surface border border-line p-4">
+  <h3 class="font-bold">Bill Print — 80mm thermal</h3>
+  <div class="mt-3 flex gap-6 flex-wrap">
+   <div class="w-[72mm] bg-white border border-ink p-3 text-[11px] leading-tight">
+    <div class="text-center border-b border-dashed border-ink pb-2"><div class="font-bold text-sm">Demo Kitchen</div><div>Connaught Place, New Delhi — GSTIN 07ABCDE1234F1Z5</div><div class="font-bold mt-1">Tax Invoice</div><div>INV/2026-27/00042 · 11 Sep 2026 · Table T2</div></div>
+    <div class="py-2 space-y-1"><div class="flex justify-between"><span>Paneer ×1</span><span>280.00</span></div><div class="flex justify-between"><span>Naan ×3</span><span>180.00</span></div><div class="flex justify-between"><span>Dal ×1</span><span>240.00</span></div></div>
+    <div class="border-t border-dashed border-ink pt-2 space-y-1"><div class="flex justify-between"><span>Subtotal</span><span>700.00</span></div><div class="flex justify-between"><span>CGST 2.5%</span><span>16.54</span></div><div class="flex justify-between"><span>SGST 2.5%</span><span>16.54</span></div><div class="flex justify-between font-bold border-t border-ink pt-1"><span>Grand Total</span><span>695.00</span></div><div class="text-center text-[10px]">Rupees Six Hundred Ninety Five Only</div></div>
+    <div class="border-t border-dashed border-ink mt-2 pt-2 text-center"><div class="w-16 h-16 bg-ink mx-auto grid place-items-center text-white text-[8px]">UPI QR<br>₹695</div><div>Scan to pay · Powered by restaurant portal</div></div>
+   </div>
+   <div class="text-xs text-ink/60 max-w-[300px]"><ul class="list-disc ml-4 space-y-1"><li>@page 80mm/58mm · record payment (Cash/UPI/Card/Other) · split on Growth+</li><li>Void keeps number · reopen within 30m if table free</li></ul>
+   <button onclick="window.print()" class="mt-3 border border-line px-4 py-2 rounded-full bg-surface">Test print</button></div>
+  </div>
+ </div>
+</section>
+
+<!-- TOTAL ORDERS -->
+<section id="s-total" class="page hidden max-w-[1400px] mx-auto px-4 py-4">
+ <div class="rounded-2xl bg-surface border border-line overflow-hidden">
+  <div class="px-4 py-3 border-b border-line flex justify-between"><h3 class="font-bold">Total Orders — Today (business day 04:00)</h3><span class="text-xs border border-line px-2 py-1 rounded-full">Filters: table · payment · invoice search</span></div>
+  <div class="px-4 py-2 bg-paper flex gap-3 text-xs font-semibold"><span>Bills 12</span>·<span>Gross ₹21k</span>·<span>Discounts ₹420</span>·<span>Tax ₹980</span>·<span>Net ₹18,420</span></div>
+  <div class="divide-y divide-line text-sm">
+   <div class="px-4 py-3 flex justify-between"><span><b>INV/2026-27/00042</b> · T5 · 31 min · <span class="tabular font-bold">₹875</span> · <span class="text-xs px-2 py-1 rounded-full bg-served text-white">Paid · UPI</span></span><button class="text-xs border border-line px-2 py-1 rounded-full">Reprint</button></div>
+   <div class="px-4 py-3 flex justify-between"><span><b>INV/2026-27/00041</b> · T2 · <span class="bg-voided text-white text-[10px] px-1.5 rounded">VOID</span> · wrong table</span><span class="text-xs text-ink/50">Closed without bill filter also</span></div>
+  </div>
+ </div>
+</section>
+
+<!-- MENU -->
+<section id="s-menu" class="page hidden max-w-[1400px] mx-auto px-4 py-4">
+ <div class="rounded-2xl bg-surface border border-line p-4">
+  <h3 class="font-bold">Menu — categories + items · drag ≡ to reorder</h3>
+  <div class="mt-3 grid md:grid-cols-3 gap-3 text-sm">
+   <div class="border border-line rounded-xl p-3 bg-paper"><div class="font-semibold">Starters ≡</div><div class="mt-2 space-y-1"><div class="bg-surface border border-line rounded px-2 py-1 flex justify-between"><span>Paneer Tikka — ₹280</span><span class="text-served">● In stock</span></div><div class="bg-surface border border-line rounded px-2 py-1 flex justify-between"><span>Masala Dosa — ₹180</span><span class="text-served">●</span></div></div><button class="mt-2 w-full text-xs border border-dashed border-line py-2 rounded-full">+ Add item / variant (Half/Full) / image</button></div>
+   <div class="border border-line rounded-xl p-3 bg-paper"><div class="font-semibold">Main Course ≡</div><div class="mt-2 bg-surface border border-line rounded px-2 py-1">Chicken Biryani — from ₹220 (variants)</div></div>
+   <div class="border border-line rounded-xl p-3 bg-paper"><div class="font-semibold">Breads ≡</div><div class="mt-2 bg-surface border border-line rounded px-2 py-1">Butter Naan — ₹60</div></div>
+  </div>
+ </div>
+</section>
+
+<!-- TABLES -->
+<section id="s-tables" class="page hidden max-w-[1400px] mx-auto px-4 py-4">
+ <div class="rounded-2xl bg-surface border border-line p-4">
+  <h3 class="font-bold">Tables & QR</h3>
+  <div class="mt-3 grid grid-cols-3 md:grid-cols-6 gap-3">
+   <div class="rounded-xl border-2 border-ink p-2 text-center"><div class="h-20 bg-ink text-white grid place-items-center text-xs">QR<br>T5<br>a8Kx2p</div><div class="text-xs font-bold mt-1">T5 — Occupied</div></div>
+   <div class="rounded-xl border border-line p-2 text-center"><div class="h-20 bg-paper border border-line grid place-items-center text-xs">QR<br>T2</div><div class="text-xs font-bold mt-1">T2</div></div>
+   <div class="rounded-xl border border-dashed border-line p-2 grid place-items-center text-xs text-ink/40">+ Add tables<br>1–20 · max per plan</div>
+  </div>
+  <div class="flex gap-2 mt-3"><button class="text-xs border border-line px-3 py-2 rounded-full">Download PNG</button><button class="text-xs bg-ink text-white px-4 py-2 rounded-full">Print QR cards — A4 · 6/page</button><button onclick="toast('QR regenerated — old sticker invalid')" class="text-xs border border-voided text-voided px-3 py-2 rounded-full">Regenerate QR</button></div>
+  <div class="text-xs text-ink/50 mt-2">QR encodes /t/[qrToken] — 16-char base62. Starter max 8 tables, Growth unlimited.</div>
+ </div>
+</section>
+
+<section id="s-staff" class="page hidden max-w-[1400px] mx-auto px-4 py-4">
+ <div class="rounded-2xl bg-surface border border-line overflow-hidden">
+  <div class="px-4 py-3 border-b border-line flex justify-between"><h3 class="font-bold">Staff — owner manages managers, manager manages waiter/kitchen</h3><button class="text-sm bg-brand text-white px-4 py-2 rounded-full">+ Add staff</button></div>
+  <table class="w-full text-sm"><thead class="bg-paper text-xs text-ink/50"><tr><th class="text-left px-4 py-2">Name</th><th>Username</th><th>Role</th><th>Status</th><th></th></tr></thead><tbody class="divide-y divide-line"><tr><td class="px-4 py-2">Owner</td><td class="px-4 py-2">owner</td><td class="px-4 py-2">owner</td><td class="px-4 py-2">active</td><td class="px-4 py-2 text-xs border border-line rounded-full inline-block m-2">Reset password</td></tr><tr><td class="px-4 py-2">Waiter 1</td><td class="px-4 py-2">waiter1</td><td class="px-4 py-2">waiter</td><td class="px-4 py-2">active</td></tr><tr><td class="px-4 py-2">Kitchen 1</td><td class="px-4 py-2">kitchen1</td><td class="px-4 py-2">kitchen</td></tr></tbody></table>
+  <div class="p-3 text-xs text-ink/50">Login: restaurant code (slug) + username + password → synthetic email &lt;user&gt;@&lt;slug&gt;.staff... · max_staff per plan.</div>
+ </div>
+</section>
+
+<section id="s-settings" class="page hidden max-w-[1400px] mx-auto px-4 py-4 grid md:grid-cols-2 gap-4">
+ <div class="rounded-2xl bg-surface border border-line p-4"><h3 class="font-bold">Restaurant</h3><div class="mt-2 space-y-2 text-sm"><label class="block">Name <input value="Demo Kitchen" class="w-full border border-line rounded-lg px-3 py-2"></label><label class="block">Address <input value="Connaught Place" class="w-full border border-line rounded-lg px-3 py-2"></label></div></div>
+ <div class="rounded-2xl bg-surface border border-line p-4"><h3 class="font-bold">Tax & Bill</h3><div class="mt-2 text-sm space-y-2"><div class="flex gap-2"><select class="border border-line rounded-full px-3 py-2"><option>regular 5%</option><option>composition</option><option>none</option></select><label class="flex items-center gap-1 text-xs"><input type="checkbox"> Prices include tax</label></div><label class="flex items-center gap-1 text-xs"><input type="checkbox" checked> Service charge 5% (optional)</label><div class="text-xs text-ink/50">Check with CA. GSTIN, FSSAI printed on bill.</div></div></div>
+ <div class="rounded-2xl bg-surface border border-line p-4"><h3 class="font-bold">Ordering</h3><div class="text-sm space-y-1"><div>Require first-order approval: <b>On</b></div><div>Cancel window: 120s · Reopen window: 30m · Day start: 04:00</div></div></div>
+ <div class="rounded-2xl bg-surface border border-line p-4"><h3 class="font-bold">Bill</h3><div class="text-sm">Prefix INV · 80mm/58mm · Footer “Thank you” · UPI VPA toggle</div></div>
+</section>
+
+<div id="toast" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 bg-ink text-white text-sm px-4 py-3 rounded-full shadow-lg z-50"></div>
+<script>
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));document.getElementById('s-'+id).classList.remove('hidden');document.querySelectorAll('.nav').forEach(n=>n.className='nav px-4 py-2 rounded-full text-sm bg-surface border border-line whitespace-nowrap');document.getElementById('n-'+id).className='nav px-4 py-2 rounded-full text-sm font-semibold bg-ink text-white whitespace-nowrap';window.scrollTo({top:0,behavior:'smooth'})}
+function toast(m){let t=document.getElementById('toast');t.textContent=m;t.classList.remove('hidden');clearTimeout(t._id);t._id=setTimeout(()=>t.classList.add('hidden'),2400)}
+</script>
+</body>
+</html>

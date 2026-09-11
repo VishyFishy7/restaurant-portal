@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>restaurant portal — Prototypes</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script>tailwind.config={theme:{extend:{colors:{ink:'#243040',paper:'#F6F7F9',surface:'#FFF',line:'#D9DEE5',brand:'#3B4BA8'},fontFamily:{sans:['Noto Sans','sans-serif']}}}}</script>
+<style>*{font-family:'Noto Sans',sans-serif}</style>
+</head>
+<body class="bg-paper text-ink min-h-screen grid place-items-center p-6">
+<div class="max-w-[720px] w-full space-y-6">
+ <div class="text-center space-y-2">
+  <div class="w-10 h-10 rounded-xl bg-brand grid place-items-center text-white font-bold mx-auto">R</div>
+  <h1 class="text-2xl font-bold">restaurant portal</h1>
+  <p class="text-sm text-ink/60">2 HTML prototypes — no tech stack, pure HTML + Tailwind CDN. Share directly with clients.</p>
+ </div>
+ <div class="grid md:grid-cols-2 gap-4">
+  <a href="customer.html" class="rounded-2xl bg-surface border-2 border-ink p-6 space-y-3 hover:shadow-lg transition">
+   <div class="w-10 h-10 rounded-xl bg-ink text-white grid place-items-center">📱</div>
+   <div class="font-bold">Customer Prototype</div>
+   <div class="text-sm text-ink/60">Phone view: QR → Menu → Cart → Orders. Veg filter, variants, 2-min cancel, poll 10s.</div>
+   <div class="text-sm font-semibold text-brand">Open customer.html →</div>
+  </a>
+  <a href="admin.html" class="rounded-2xl bg-surface border border-line p-6 space-y-3 hover:shadow-lg transition">
+   <div class="w-10 h-10 rounded-xl bg-brand text-white grid place-items-center">🏪</div>
+   <div class="font-bold">Restaurant Portal</div>
+   <div class="text-sm text-ink/60">Admin + Staff: Live board, Kitchen, Billing, Print 80mm, Total Orders, Menu, Tables & QR, Staff, Settings.</div>
+   <div class="text-sm font-semibold text-brand">Open admin.html →</div>
+  </a>
+ </div>
+ <div class="rounded-xl bg-surface border border-line p-4 text-xs leading-relaxed">
+  <b>Spec mapping:</b> Customer route <code class="bg-paper border border-line px-1 rounded">/t/[qrToken]</code>, one open session per table, approval gate, billing with GST/service/round-off, invoice FY April–March, business day 04:00. Payment not in app — only record (Cash/UPI/Card).
+  <div class="mt-2 text-ink/50">Files are standalone — open offline, no build.</div>
+ </div>
+</div>
+</body>
+</html>
