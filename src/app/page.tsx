@@ -7,9 +7,9 @@ import { desc } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
-  const tables = db.select().from(schema.diningTables).orderBy(desc(schema.diningTables.table_number)).all();
-  const restaurant = db.select().from(schema.restaurants).limit(1).get();
+export default async function HomePage() {
+  const tables = await db.select().from(schema.diningTables).orderBy(desc(schema.diningTables.table_number)).all();
+  const restaurant = await db.select().from(schema.restaurants).limit(1).get();
   return (
     <main className="mx-auto flex min-h-dvh w-full max-w-3xl flex-col px-4 py-6">
       <header className="mb-8 flex items-center justify-between">

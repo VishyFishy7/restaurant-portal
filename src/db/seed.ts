@@ -1,11 +1,6 @@
-import fs from "node:fs";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import * as schema from "./schema";
-import { DB_PATH } from "./index";
+import { schema, db, migrateDb, isLocal, getDatabaseUrl } from "./client";
 
 // ---- helpers ---------------------------------------------------------
 const BASE62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -18,25 +13,19 @@ function qrToken(len = 16): string {
 
 const inr = (rupees: number) => Math.round(rupees * 100); // paise
 
-const DB_DIR = path.join(process.cwd(), "data");
+const MIGRATIONS_DIR = path.join(process.cwd(), "drizzle");
 
 async function seed() {
-  fs.mkdirSync(DB_DIR, { recursive: true });
-  const sqlite = new Database(DB_PATH);
-  sqlite.pragma("journal_mode = WAL");
-  sqlite.pragma("foreign_keys = ON");
-  const db = drizzle(sqlite, { schema });
+  await migrateDb(MIGRATIONS_DIR);
 
-  migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
-
-  const existing = db.select().from(schema.restaurants).all();
+  const existing = await db.select().from(schema.restaurants).all();
   if (existing.length > 0) {
-    console.log("DB already seeded — skipping. (Table count:", db.select().from(schema.diningTables).all().length, ")");
+    console.log("DB already seeded — skipping. (Table count:", (await db.select().from(schema.diningTables).all()).length, ")");
     return;
   }
 
   // 1. Restaurant
-  const rest = db
+  const rest = await db
     .insert(schema.restaurants)
     .values({
       name: "Demo Kitchen",
@@ -58,7 +47,7 @@ async function seed() {
   const tables = [];
   for (let n = 1; n <= 6; n++) {
     tables.push(
-      db
+      await db
         .insert(schema.diningTables)
         .values({ restaurant_id: rid, label: `Table ${n}`, table_number: n, qr_token: qrToken() })
         .returning().get(),
@@ -69,7 +58,7 @@ async function seed() {
   const catNames = ["Starters", "Main Course", "Breads", "Beverages"];
   const cats: Record<string, number> = {};
   for (const [i, name] of catNames.entries()) {
-    const c = db
+    const c = await db
       .insert(schema.menuCategories)
       .values({ restaurant_id: rid, name, sort_order: i })
       .returning()
@@ -99,7 +88,7 @@ async function seed() {
 
   let dalMakhaniId = 0;
   for (const [i, [name, cat, price, veg, avail, desc]] of items.entries()) {
-    const m = db
+    const m = await db
       .insert(schema.menuItems)
       .values({
         restaurant_id: rid,
@@ -117,14 +106,13 @@ async function seed() {
   }
 
   // 5. Half/Full variant on Dal Makhani
-  db.insert(schema.menuItemVariants)
+  await db
+    .insert(schema.menuItemVariants)
     .values([
       { menu_item_id: dalMakhaniId, name: "Half", price: inr(160) },
       { menu_item_id: dalMakhaniId, name: "Full", price: inr(220) },
     ])
     .run();
-
-  sqlite.close();
 
   console.log("✓ Seeded Demo Kitchen");
   console.log("  tables:", tables.map((t) => t.label).join(", "));
@@ -134,7 +122,13 @@ async function seed() {
   for (const t of tables) console.log(`   /t/${t.qr_token}  (${t.label})`);
 }
 
-seed().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+console.log(`Seeding against ${isLocal() ? `local SQLite (${getDatabaseUrl()})` : `remote libSQL (${getDatabaseUrl()})`}`);
+seed()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    const { closeDb } = await import("./client");
+    await closeDb();
+  });

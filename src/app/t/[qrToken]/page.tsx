@@ -9,14 +9,14 @@ type Props = { params: Promise<{ qrToken: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { qrToken } = await params;
-  const payload = getMenuByQrToken(qrToken);
+  const payload = await getMenuByQrToken(qrToken);
   return { title: payload ? payload.restaurant.name : "Table not found" };
 }
 
 export default async function CustomerTablePage({ params }: Props) {
   const { qrToken } = await params;
-  const payload = getMenuByQrToken(qrToken);
+  const payload = await getMenuByQrToken(qrToken);
   if (!payload) notFound();
-  const sessionInitial = getSessionByQrToken(qrToken);
+  const sessionInitial = await getSessionByQrToken(qrToken);
   return <CustomerMenu qrToken={qrToken} payload={payload} sessionInitial={sessionInitial} />;
 }

@@ -28,33 +28,33 @@ export type MenuPayload = {
   }>;
 };
 
-export function getMenuByQrToken(qrToken: string): MenuPayload | null {
-  const table = db
+export async function getMenuByQrToken(qrToken: string): Promise<MenuPayload | null> {
+  const table = await db
     .select()
     .from(schema.diningTables)
     .where(and(eq(schema.diningTables.qr_token, qrToken), eq(schema.diningTables.is_active, 1)))
     .get();
   if (!table) return null;
-  const restaurant = db
+  const restaurant = await db
     .select()
     .from(schema.restaurants)
     .where(eq(schema.restaurants.id, table.restaurant_id))
     .get();
   if (!restaurant) return null;
 
-  const categories = db
+  const categories = await db
     .select()
     .from(schema.menuCategories)
     .where(and(eq(schema.menuCategories.restaurant_id, restaurant.id), eq(schema.menuCategories.is_active, 1)))
     .orderBy(asc(schema.menuCategories.sort_order))
     .all();
-  const items = db
+  const items = await db
     .select()
     .from(schema.menuItems)
     .where(and(eq(schema.menuItems.restaurant_id, restaurant.id), eq(schema.menuItems.is_active, 1)))
     .orderBy(asc(schema.menuItems.sort_order))
     .all();
-  const variants = db.select().from(schema.menuItemVariants).all();
+  const variants = await db.select().from(schema.menuItemVariants).all();
 
   return {
     restaurant: {
@@ -111,26 +111,26 @@ export type SessionPayload = {
   orders: SessionOrder[];
 };
 
-export function getSessionByQrToken(qrToken: string): SessionPayload {
-  const table = db
+export async function getSessionByQrToken(qrToken: string): Promise<SessionPayload> {
+  const table = await db
     .select()
     .from(schema.diningTables)
     .where(eq(schema.diningTables.qr_token, qrToken))
     .get();
   if (!table) return { session: null, orders: [] };
-  const session = db
+  const session = await db
     .select()
     .from(schema.tableSessions)
     .where(and(eq(schema.tableSessions.table_id, table.id), eq(schema.tableSessions.status, "open")))
     .get();
   if (!session) return { session: null, orders: [] };
-  const orders = db
+  const orders = await db
     .select()
     .from(schema.orders)
     .where(eq(schema.orders.session_id, session.id))
     .orderBy(asc(schema.orders.order_number))
     .all();
-  const items = db
+  const items = await db
     .select()
     .from(schema.orderItems)
     .where(eq(schema.orderItems.session_id, session.id))
@@ -171,46 +171,48 @@ export type LiveTable = {
   }>;
 };
 
-export function getLiveBoard(): LiveTable[] {
-  const tables = db
+export async function getLiveBoard(): Promise<LiveTable[]> {
+  const tables = await db
     .select()
     .from(schema.diningTables)
     .where(eq(schema.diningTables.is_active, 1))
     .orderBy(asc(schema.diningTables.table_number))
     .all();
-  return tables.map((t) => {
-    const session = db
-      .select()
-      .from(schema.tableSessions)
-      .where(and(eq(schema.tableSessions.table_id, t.id), eq(schema.tableSessions.status, "open")))
-      .get();
-    if (!session) return { table: { id: t.id, label: t.label, qr_token: t.qr_token }, session: null, orders: [] };
-    const orders = db
-      .select()
-      .from(schema.orders)
-      .where(eq(schema.orders.session_id, session.id))
-      .orderBy(asc(schema.orders.order_number))
-      .all();
-    const items = db
-      .select()
-      .from(schema.orderItems)
-      .where(eq(schema.orderItems.session_id, session.id))
-      .orderBy(desc(schema.orderItems.id))
-      .all();
-    return {
-      table: { id: t.id, label: t.label, qr_token: t.qr_token },
-      session: { id: session.id, approval_status: session.approval_status, opened_at: session.opened_at },
-      orders: orders.map((o) => ({
-        id: o.id,
-        order_number: o.order_number,
-        status: o.status,
-        created_at: o.created_at,
-        items: items
-          .filter((i) => i.order_id === o.id)
-          .map((it) => ({ id: it.id, item_name: it.item_name, variant_name: it.variant_name, quantity: it.quantity, status: it.status })),
-      })),
-    };
-  });
+  return Promise.all(
+    tables.map(async (t) => {
+      const session = await db
+        .select()
+        .from(schema.tableSessions)
+        .where(and(eq(schema.tableSessions.table_id, t.id), eq(schema.tableSessions.status, "open")))
+        .get();
+      if (!session) return { table: { id: t.id, label: t.label, qr_token: t.qr_token }, session: null, orders: [] };
+      const orders = await db
+        .select()
+        .from(schema.orders)
+        .where(eq(schema.orders.session_id, session.id))
+        .orderBy(asc(schema.orders.order_number))
+        .all();
+      const items = await db
+        .select()
+        .from(schema.orderItems)
+        .where(eq(schema.orderItems.session_id, session.id))
+        .orderBy(desc(schema.orderItems.id))
+        .all();
+      return {
+        table: { id: t.id, label: t.label, qr_token: t.qr_token },
+        session: { id: session.id, approval_status: session.approval_status, opened_at: session.opened_at },
+        orders: orders.map((o) => ({
+          id: o.id,
+          order_number: o.order_number,
+          status: o.status,
+          created_at: o.created_at,
+          items: items
+            .filter((i) => i.order_id === o.id)
+            .map((it) => ({ id: it.id, item_name: it.item_name, variant_name: it.variant_name, quantity: it.quantity, status: it.status })),
+        })),
+      };
+    }),
+  );
 }
 
 export type BillPreviewItem = { id: number; item_name: string; variant_name: string | null; quantity: number; amount: number };
@@ -226,17 +228,17 @@ export type BillSession = {
   total: number;
 };
 
-export function getBillableSessions(): BillSession[] {
-  const sessions = db
+export async function getBillableSessions(): Promise<BillSession[]> {
+  const sessions = await db
     .select()
     .from(schema.tableSessions)
     .where(eq(schema.tableSessions.status, "open"))
     .all();
-  const restaurant = db.select().from(schema.restaurants).limit(1).get();
+  const restaurant = await db.select().from(schema.restaurants).limit(1).get();
   const result: BillSession[] = [];
   for (const s of sessions) {
-    const table = db.select().from(schema.diningTables).where(eq(schema.diningTables.id, s.table_id)).get();
-    const items = db
+    const table = await db.select().from(schema.diningTables).where(eq(schema.diningTables.id, s.table_id)).get();
+    const items = await db
       .select()
       .from(schema.orderItems)
       .where(and(eq(schema.orderItems.session_id, s.id), sql`${schema.orderItems.status} != 'cancelled'`))
@@ -265,38 +267,40 @@ export function getBillableSessions(): BillSession[] {
   return result;
 }
 
-export function getClosedBills() {
-  const bills = db.select().from(schema.bills).orderBy(desc(schema.bills.generated_at)).all();
-  return bills.map((b) => {
-    const table = db.select().from(schema.diningTables).where(eq(schema.diningTables.id, b.table_id)).get();
-    const items = db
-      .select()
-      .from(schema.orderItems)
-      .where(and(eq(schema.orderItems.session_id, b.session_id), sql`${schema.orderItems.status} != 'cancelled'`))
-      .all();
-    return { ...b, table_label: table?.label ?? `#${b.table_id}`, items };
-  });
+export async function getClosedBills() {
+  const bills = await db.select().from(schema.bills).orderBy(desc(schema.bills.generated_at)).all();
+  return Promise.all(
+    bills.map(async (b) => {
+      const table = await db.select().from(schema.diningTables).where(eq(schema.diningTables.id, b.table_id)).get();
+      const items = await db
+        .select()
+        .from(schema.orderItems)
+        .where(and(eq(schema.orderItems.session_id, b.session_id), sql`${schema.orderItems.status} != 'cancelled'`))
+        .all();
+      return { ...b, table_label: table?.label ?? `#${b.table_id}`, items };
+    }),
+  );
 }
 
-export function dashboardStats() {
-  const openSessions = db
+export async function dashboardStats() {
+  const openSessions = await db
     .select()
     .from(schema.tableSessions)
     .where(eq(schema.tableSessions.status, "open"))
     .all();
-  const pendingOrders = db
+  const pendingOrders = await db
     .select()
     .from(schema.orders)
     .where(eq(schema.orders.status, "pending_approval"))
     .all();
-  const activeItems = db
+  const activeItems = await db
     .select()
     .from(schema.orderItems)
     .where(sql`${schema.orderItems.status} IN ('placed','preparing','ready')`)
     .all();
-  const todayBills = db.select().from(schema.bills).all();
+  const todayBills = await db.select().from(schema.bills).all();
   const revenue = todayBills.reduce((s, b) => s + b.total, 0);
-  const allItems = db
+  const allItems = await db
     .select()
     .from(schema.orderItems)
     .where(sql`${schema.orderItems.status} != 'cancelled'`)
@@ -312,19 +316,23 @@ export function dashboardStats() {
   };
 }
 
-export function getOpenSessionsSummary() {
-  const sessions = db
+export async function getOpenSessionsSummary() {
+  const sessions = await db
     .select()
     .from(schema.tableSessions)
     .where(eq(schema.tableSessions.status, "open"))
     .all();
-  return sessions.map((s) => {
-    const table = db.select().from(schema.diningTables).where(eq(schema.diningTables.id, s.table_id)).get();
-    const orderCount = db
-      .select({ c: sql<number>`count(*)` })
-      .from(schema.orders)
-      .where(eq(schema.orders.session_id, s.id))
-      .get()?.c ?? 0;
-    return { session_id: s.id, table_label: table?.label ?? `#${s.table_id}`, approval_status: s.approval_status, order_count: orderCount, opened_at: s.opened_at };
-  });
+  return Promise.all(
+    sessions.map(async (s) => {
+      const table = await db.select().from(schema.diningTables).where(eq(schema.diningTables.id, s.table_id)).get();
+      const orderCount = (
+        (await db
+          .select({ c: sql<number>`count(*)` })
+          .from(schema.orders)
+          .where(eq(schema.orders.session_id, s.id))
+          .get())?.c ?? 0
+      );
+      return { session_id: s.id, table_label: table?.label ?? `#${s.table_id}`, approval_status: s.approval_status, order_count: orderCount, opened_at: s.opened_at };
+    }),
+  );
 }
