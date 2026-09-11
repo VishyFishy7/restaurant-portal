@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>Customer Prototype — Restaurant Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>tailwind.config={theme:{extend:{colors:{ink:'#111827',paper:'#F3F4F6',surface:'#FFFFFF',line:'#E5E7EB',brand:'#111827',placed:'#6B7280',preparing:'#374151',ready:'#1F2937',served:'#111827',voided:'#6B7280',attention:'#111827'},fontFamily:{sans:['Noto Sans','sans-serif']}}}}</script>
+<style>
+  *{font-family:'Noto Sans',sans-serif}
+  .tabular{font-variant-numeric:tabular-nums}
+  .scrollbar-hide::-webkit-scrollbar{display:none}
+  .scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
+
+  /* micro-interactions */
+  @keyframes paneIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .pane-in{animation:paneIn .22s ease-out both}
+  @keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+  .toast-in{animation:toastIn .2s ease-out both}
+  @keyframes badgePop{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+  .badge-pop{animation:badgePop .28s ease-out}
+
+  /* safe-area aware padding for fixed/sticky chrome */
+  .safe-b{padding-bottom:calc(0.75rem + env(safe-area-inset-bottom))}
+  .safe-b-sheet{padding-bottom:calc(1.25rem + env(safe-area-inset-bottom))}
+
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body class="bg-paper text-ink antialiased">
+
+<!-- ══ TOP BAR ══ -->
+<header class="sticky top-0 z-50 bg-surface/95 backdrop-blur border-b border-line">
+  <div class="max-w-[560px] mx-auto px-4 h-[52px] flex items-center justify-between gap-2">
+    <div class="flex items-center gap-2 min-w-0">
+      <div class="w-7 h-7 rounded-lg bg-brand grid place-items-center text-white font-bold text-xs shrink-0">R</div>
+      <span class="font-bold text-sm truncate">restaurant portal</span>
+      <span class="hidden min-[420px]:inline text-[10px] font-medium px-2 py-0.5 rounded-full bg-paper border border-line text-ink/60">Customer Prototype</span>
+    </div>
+    <a href="admin.html" class="shrink-0 text-[11px] font-semibold border border-ink px-3 py-1.5 rounded-full hover:bg-ink hover:text-white active:scale-95 transition">→ Restaurant Portal</a>
+  </div>
+</header>
+
+<div class="max-w-[560px] mx-auto bg-surface min-h-[calc(100vh-52px)] border-x border-line shadow-sm pb-24">
+
+  <!-- ══ RESTAURANT / TABLE HERO ══ -->
+  <section class="px-4 pt-5 pb-4 border-b border-line">
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex gap-3 min-w-0">
+        <div class="w-11 h-11 rounded-2xl bg-paper border border-line grid place-items-center text-xl shrink-0">🍛</div>
+        <div class="min-w-0">
+          <h1 class="font-bold text-[15px] leading-tight truncate">Demo Kitchen</h1>
+          <p class="mt-0.5 text-xs text-ink/60">Connaught Place · Table <span class="font-semibold text-ink">05</span></p>
+          <div class="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-ink/40">
+            <span class="px-1.5 py-0.5 bg-ink text-white rounded font-medium tracking-wide">YOUR TABLE</span>
+            <span class="tabular">QR /t/a8Kx2p</span>
+            <span class="text-line">•</span>
+            <span>No app · No login</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="toast('Waiter called — someone is on the way')" class="shrink-0 text-xs font-semibold border border-ink text-ink px-3 py-2 rounded-full bg-surface hover:bg-ink hover:text-white active:scale-95 transition">🔔 Call waiter</button>
+    </div>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <button onclick="switchTab('orders')" class="text-xs font-semibold bg-brand text-white px-3.5 py-2 rounded-full hover:opacity-90 active:scale-95 transition">Your table's orders (2) →</button>
+      <span class="text-xs px-3 py-2 rounded-full bg-paper border border-line text-ink/70">⏱ 18 min</span>
+      <span class="text-xs px-3 py-2 rounded-full bg-paper border border-line text-ink/70">Live · polls 10s</span>
+    </div>
+  </section>
+
+  <!-- ══ CATEGORIES + SEARCH (sticky under top bar) ══ -->
+  <div class="sticky top-[52px] z-30 bg-surface border-b border-line">
+    <div class="flex gap-2 px-3 pt-3 pb-2.5 overflow-x-auto scrollbar-hide">
+      <button class="px-3.5 py-1.5 rounded-full bg-ink text-white text-sm font-semibold whitespace-nowrap transition">All</button>
+      <button class="px-3.5 py-1.5 rounded-full bg-paper border border-line text-sm text-ink/70 whitespace-nowrap hover:border-ink/30 hover:text-ink transition">Starters</button>
+      <button class="px-3.5 py-1.5 rounded-full bg-paper border border-line text-sm text-ink/70 whitespace-nowrap hover:border-ink/30 hover:text-ink transition">Main Course</button>
+      <button class="px-3.5 py-1.5 rounded-full bg-paper border border-line text-sm text-ink/70 whitespace-nowrap hover:border-ink/30 hover:text-ink transition">Breads</button>
+      <button class="px-3.5 py-1.5 rounded-full bg-paper border border-line text-sm text-ink/70 whitespace-nowrap hover:border-ink/30 hover:text-ink transition">Beverages</button>
+    </div>
+    <div class="px-3 pb-3 flex gap-2">
+      <div class="flex-1 relative min-w-0">
+        <input placeholder="Search — e.g. paneer" class="w-full text-sm border border-line rounded-full pl-9 pr-3 py-2 bg-paper placeholder-ink/35 focus:outline-none focus:ring-2 focus:ring-ink/15 focus:border-ink/30 transition">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </div>
+      <button id="vegToggle" onclick="toggleVeg()" class="shrink-0 text-xs font-semibold border border-line px-3.5 py-2 rounded-full bg-paper flex items-center gap-1.5 active:scale-95 transition">
+        <span id="vegDot" class="w-3.5 h-3.5 rounded-[4px] border-[1.5px] border-ink grid place-items-center shrink-0 transition"><span id="vegDotInner" class="w-1.5 h-1.5 bg-ink rounded-full transition"></span></span>
+        Veg only
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ TABS ══ -->
+  <div class="flex gap-1 p-2 bg-paper border-b border-line">
+    <button onclick="switchTab('menu')" id="btn-menu" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition">Menu</button>
+    <button onclick="switchTab('cart')" id="btn-cart" class="flex-1 py-2.5 rounded-lg text-sm font-medium transition">Cart <span id="cartBadge" class="inline-block ml-0.5 bg-brand text-white text-[11px] font-bold px-1.5 py-0.5 rounded-full tabular">0</span></button>
+    <button onclick="switchTab('orders')" id="btn-orders" class="flex-1 py-2.5 rounded-lg text-sm font-medium transition">Orders</button>
+  </div>
+
+  <!-- ══ MENU ══ -->
+  <div id="tab-menu" class="divide-y divide-line pane-in">
+    <div class="px-4 py-3 bg-paper border-b border-line flex items-start gap-2.5">
+      <span class="text-sm leading-none mt-0.5" aria-hidden="true">⏳</span>
+      <p class="text-xs text-ink/70 leading-relaxed">You can cancel an item within <b class="text-ink">2 min</b> if the kitchen hasn't started it. After that, only staff can remove it.</p>
+    </div>
+
+    <!-- item -->
+    <div class="p-4 flex gap-3 veg-item hover:bg-paper/60 transition">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="w-4 h-4 rounded-[4px] border-[1.5px] border-ink grid place-items-center shrink-0"><span class="w-2 h-2 bg-ink rounded-full"></span></span>
+          <span class="font-semibold text-sm">Paneer Tikka</span>
+          <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-paper border border-line text-ink/60">Bestseller</span>
+        </div>
+        <p class="mt-1 text-xs text-ink/60 leading-relaxed">Cottage cheese, tikka marinade</p>
+        <div class="mt-1.5 text-sm font-bold tabular">₹280</div>
+      </div>
+      <div class="w-[90px] shrink-0">
+        <div class="h-[72px] rounded-xl bg-paper border border-line grid place-items-center text-2xl">🧀</div>
+        <button onclick="addToCart('Paneer Tikka',280)" class="w-full mt-1.5 text-xs font-bold bg-surface border-2 border-brand text-brand py-2 rounded-full hover:bg-brand hover:text-white active:scale-95 transition">ADD +</button>
+      </div>
+    </div>
+
+    <!-- item -->
+    <div class="p-4 flex gap-3 veg-item hover:bg-paper/60 transition">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="w-4 h-4 rounded-[4px] border-[1.5px] border-ink grid place-items-center shrink-0"><span class="w-2 h-2 bg-ink rounded-full"></span></span>
+          <span class="font-semibold text-sm">Butter Naan</span>
+        </div>
+        <p class="mt-1 text-xs text-ink/60 leading-relaxed">Tandoor, butter brushed</p>
+        <div class="mt-1.5 text-sm font-bold tabular">₹60</div>
+      </div>
+      <div class="w-[90px] shrink-0">
+        <div class="h-[72px] rounded-xl bg-paper border border-line grid place-items-center text-2xl">🫓</div>
+        <button onclick="addToCart('Butter Naan',60)" class="w-full mt-1.5 text-xs font-bold bg-surface border-2 border-brand text-brand py-2 rounded-full hover:bg-brand hover:text-white active:scale-95 transition">ADD +</button>
+      </div>
+    </div>
+
+    <!-- item · variant -->
+    <div class="p-4 flex gap-3 nonveg-item hover:bg-paper/60 transition">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="w-4 h-4 rounded-[4px] border-[1.5px] border-ink shrink-0"></span>
+          <span class="font-semibold text-sm">Chicken Biryani</span>
+          <span class="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-paper border border-line text-ink/60">Half / Full</span>
+        </div>
+        <p class="mt-1 text-xs text-ink/60 leading-relaxed">Hyderabadi, raita, salan</p>
+        <div class="mt-1.5 text-sm font-bold tabular">from ₹220</div>
+      </div>
+      <div class="w-[90px] shrink-0">
+        <div class="h-[72px] rounded-xl bg-paper border border-line grid place-items-center text-2xl">🍗</div>
+        <button onclick="openVariant()" class="w-full mt-1.5 text-xs font-bold bg-surface border-2 border-brand text-brand py-2 rounded-full hover:bg-brand hover:text-white active:scale-95 transition">ADD +</button>
+      </div>
+    </div>
+
+    <!-- item · unavailable -->
+    <div class="p-4 flex gap-3 opacity-60">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="w-4 h-4 rounded-[4px] border-[1.5px] border-ink grid place-items-center shrink-0"><span class="w-2 h-2 bg-ink rounded-full"></span></span>
+          <span class="font-semibold text-sm">Dal Makhani</span>
+          <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-ink text-white">Not available</span>
+        </div>
+        <p class="mt-1 text-xs text-ink/60 leading-relaxed">Slow cooked</p>
+        <div class="mt-1.5 text-sm font-bold tabular">₹240</div>
+      </div>
+      <div class="w-[90px] shrink-0">
+        <div class="h-[72px] rounded-xl bg-paper border border-line grid place-items-center text-2xl">🍲</div>
+        <div class="w-full mt-1.5 text-[11px] font-semibold bg-paper border border-line text-ink/40 py-2 rounded-full text-center">Unavailable</div>
+      </div>
+    </div>
+
+    <!-- item -->
+    <div class="p-4 flex gap-3 veg-item hover:bg-paper/60 transition">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="w-4 h-4 rounded-[4px] border-[1.5px] border-ink grid place-items-center shrink-0"><span class="w-2 h-2 bg-ink rounded-full"></span></span>
+          <span class="font-semibold text-sm">Masala Dosa</span>
+        </div>
+        <p class="mt-1 text-xs text-ink/60 leading-relaxed">Crispy, coconut chutney</p>
+        <div class="mt-1.5 text-sm font-bold tabular">₹180</div>
+      </div>
+      <div class="w-[90px] shrink-0">
+        <div class="h-[72px] rounded-xl bg-paper border border-line grid place-items-center text-2xl">🥞</div>
+        <button onclick="addToCart('Masala Dosa',180)" class="w-full mt-1.5 text-xs font-bold bg-surface border-2 border-brand text-brand py-2 rounded-full hover:bg-brand hover:text-white active:scale-95 transition">ADD +</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CART ══ -->
+  <div id="tab-cart" class="hidden p-4 space-y-4">
+    <div>
+      <h2 class="font-bold text-base">Your cart — Table 05</h2>
+      <p class="mt-0.5 text-xs text-ink/50">Review before sending it to the kitchen.</p>
+    </div>
+
+    <div id="cartItems" class="space-y-2 text-sm"></div>
+
+    <div class="rounded-xl border border-line p-4 bg-paper space-y-3">
+      <div class="flex items-center justify-between text-sm">
+        <span class="text-ink/70">Subtotal</span>
+        <span class="font-bold tabular" id="cartSubtotal">₹0</span>
+      </div>
+      <div class="border-t border-dashed border-line"></div>
+      <p class="text-[11px] text-ink/50 leading-relaxed">Taxes and charges, if any, are added to the final bill.</p>
+      <label class="block text-xs font-semibold text-ink/80">Note for kitchen
+        <input id="orderNote" placeholder="Less spicy, no onion…" class="mt-1.5 w-full border border-line rounded-lg px-3 py-2.5 text-sm bg-surface placeholder-ink/35 focus:outline-none focus:ring-2 focus:ring-ink/15 focus:border-ink/30 transition">
+      </label>
+    </div>
+
+    <button id="placeBtn" onclick="placeOrder()" class="w-full py-3.5 rounded-xl bg-brand text-white font-bold active:scale-[0.99] transition">Place order · <span id="cartTotalBtn" class="tabular">₹0</span></button>
+    <p class="text-[11px] text-ink/50 text-center leading-relaxed">Duplicate tap = one order (idempotency key). Pay cash/UPI at the counter — not in app.</p>
+  </div>
+
+  <!-- ══ ORDERS ══ -->
+  <div id="tab-orders" class="hidden p-4 space-y-3">
+    <div class="rounded-xl border border-ink/15 bg-paper p-3.5 flex items-start gap-2.5 text-xs text-ink/70">
+      <span class="text-sm leading-none mt-0.5" aria-hidden="true">⏳</span>
+      <p class="leading-relaxed"><b class="text-ink">Waiting for staff to confirm</b> your first order. The kitchen starts after the waiter approves it.</p>
+    </div>
+
+    <div class="rounded-xl border border-line overflow-hidden">
+      <div class="px-3.5 py-2.5 bg-paper border-b border-line flex items-center justify-between gap-2">
+        <span class="text-xs font-bold">Round 1 · 7:42 pm</span>
+        <span class="text-[11px] font-semibold px-2 py-1 rounded-full bg-placed text-white">Placed</span>
+      </div>
+      <div class="p-3.5 space-y-3 text-sm">
+        <div class="flex items-center justify-between gap-3"><span>Paneer Tikka ×1</span><span class="tabular text-ink/70">₹280</span></div>
+        <div class="border-t border-line"></div>
+        <div class="flex items-center justify-between gap-3">
+          <span>Butter Naan ×3 <span class="text-xs text-ink/50">— less butter</span></span>
+          <span class="flex items-center gap-2 shrink-0">
+            <span class="text-[10px] font-semibold px-2 py-1 rounded-full bg-placed text-white">Placed</span>
+            <button onclick="toast('Cancelled — within 2 min')" class="text-[11px] font-semibold border border-line px-2.5 py-1 rounded-full hover:border-ink/40 active:scale-95 transition">Cancel (1:22)</button>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-line overflow-hidden">
+      <div class="px-3.5 py-2.5 bg-paper border-b border-line flex items-center justify-between gap-2">
+        <span class="text-xs font-bold">Round 2 · 7:51 pm — by Waiter</span>
+        <span class="text-[11px] font-semibold px-2 py-1 rounded-full bg-ready text-white">Ready</span>
+      </div>
+      <div class="p-3.5 space-y-3 text-sm">
+        <div class="flex items-center justify-between gap-3"><span>Chicken Biryani (Full) ×1</span><span class="tabular text-ink/70">₹320</span></div>
+        <div class="border-t border-line"></div>
+        <div class="flex items-center justify-between gap-3">
+          <span class="line-through text-ink/40">Dal Makhani ×1 <span class="no-underline text-[10px] font-medium bg-ink text-white px-1.5 py-0.5 rounded">Removed — Out of stock</span></span>
+          <span class="line-through tabular text-ink/40 shrink-0">₹240</span>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="switchTab('menu')" class="w-full py-3.5 rounded-xl border-2 border-ink font-bold hover:bg-ink hover:text-white active:scale-[0.99] transition">+ Order more</button>
+    <button onclick="toast('Bill requested — staff notified')" class="w-full py-3 rounded-xl border border-line bg-paper text-sm font-semibold hover:border-ink/30 active:scale-[0.99] transition">🧾 Request bill</button>
+
+    <div class="rounded-xl border border-ink bg-paper p-3.5 text-xs leading-relaxed">
+      <b>After bill:</b> “Bill generated — please pay at the counter. Next scan starts a fresh session, so orders never mix.”
+    </div>
+  </div>
+
+  <!-- ══ BOTTOM SHEET · VARIANT ══ -->
+  <div id="variantSheet" class="hidden fixed inset-0 z-50">
+    <div id="variantBackdrop" class="absolute inset-0 bg-ink/40 opacity-0 transition-opacity duration-200" onclick="closeVariant()"></div>
+    <div id="variantPanel" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[560px] bg-surface rounded-t-3xl px-4 pt-3 safe-b-sheet space-y-3 translate-y-full transition-transform duration-200 ease-out max-h-[80vh] overflow-y-auto">
+      <div class="w-10 h-1 rounded-full bg-line mx-auto"></div>
+      <div>
+        <h3 class="font-bold text-base">Chicken Biryani</h3>
+        <p class="text-xs text-ink/50">Choose a portion size</p>
+      </div>
+      <label class="vopt flex items-center justify-between border border-line rounded-xl px-3.5 py-3 cursor-pointer transition hover:border-ink/30" data-name="Chicken Biryani (Half)" data-price="220" onclick="pickVariant(this)">
+        <span class="flex items-center gap-2.5 text-sm font-medium"><input type="radio" name="v" class="accent-ink"> Half</span>
+        <span class="font-bold tabular">₹220</span>
+      </label>
+      <label class="vopt flex items-center justify-between border-2 border-brand bg-brand/5 rounded-xl px-3.5 py-3 cursor-pointer transition" data-name="Chicken Biryani (Full)" data-price="320" onclick="pickVariant(this)">
+        <span class="flex items-center gap-2.5 text-sm font-medium"><input type="radio" name="v" checked class="accent-ink"> Full</span>
+        <span class="font-bold tabular">₹320</span>
+      </label>
+      <button id="variantBtn" data-name="Chicken Biryani (Full)" data-price="320" onclick="addVariant()" class="w-full py-3.5 rounded-xl bg-brand text-white font-bold active:scale-[0.99] transition">Add to order · ₹320</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ROUTE FOOTER ══ -->
+<div class="max-w-[560px] mx-auto mt-3 px-4 pb-4 text-[11px] text-ink/50 text-center leading-relaxed">
+  Route <code class="bg-surface border border-line px-1.5 py-0.5 rounded tabular">/t/[qrToken]</code> · 16-char base62 QR<br>Customer is anonymous — no direct DB access
+</div>
+
+<!-- ══ PERSISTENT CART BAR ══ -->
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[560px] z-40 bg-ink text-white px-4 py-3 safe-b flex items-center justify-between gap-3">
+  <div class="text-sm"><span id="barCount" class="text-white/80">0 items</span><span class="text-white/30 mx-1.5">·</span><span id="barTotal" class="font-bold tabular">₹0</span></div>
+  <button onclick="switchTab('cart')" class="bg-surface text-ink px-4 py-2 rounded-full text-sm font-bold hover:bg-paper active:scale-95 transition">View cart →</button>
+</div>
+
+<div id="toast" role="status" aria-live="polite" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 bg-ink text-white text-sm font-medium px-4 py-3 rounded-full shadow-lg z-[60] max-w-[calc(100vw-2rem)] text-center"></div>
+
+<script>
+  /* ── tabs ── */
+  var tabBase = 'flex-1 py-2.5 rounded-lg transition';
+  function switchTab(w){
+    ['menu','cart','orders'].forEach(function(k){
+      var pane = document.getElementById('tab-'+k);
+      var btn  = document.getElementById('btn-'+k);
+      var active = (k === w);
+      pane.classList.toggle('hidden', !active);
+      if(active){ pane.classList.remove('pane-in'); void pane.offsetWidth; pane.classList.add('pane-in'); }
+      btn.className = tabBase + (active
+        ? ' bg-ink text-white font-semibold'
+        : ' bg-surface border border-line font-medium text-ink/70 hover:border-ink/30');
+    });
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  /* ── cart ── */
+  var cart = {};                                   // name -> { q, p }
+  function cartCount(){ return Object.values(cart).reduce(function(a,i){return a+i.q;},0); }
+  function cartTotal(){ return Object.values(cart).reduce(function(s,i){return s+i.q*i.p;},0); }
+
+  function addToCart(n,p){
+    cart[n] = cart[n] || { q:0, p:p };
+    cart[n].q++;
+    renderCart();
+    var b = document.getElementById('cartBadge');
+    b.classList.remove('badge-pop'); void b.offsetWidth; b.classList.add('badge-pop');
+    toast(n + ' added');
+  }
+  function incItem(n){ if(cart[n]){ cart[n].q++; renderCart(); } }
+  function decItem(n){ if(!cart[n])return; cart[n].q--; if(cart[n].q <= 0) delete cart[n]; renderCart(); }
+
+  function renderCart(){
+    var c = cartCount(), t = cartTotal();
+    document.getElementById('cartBadge').textContent = c;
+    document.getElementById('barCount').textContent = c === 0 ? 'No items' : c + (c === 1 ? ' item' : ' items');
+    document.getElementById('barTotal').textContent = '₹' + t;
+    document.getElementById('cartSubtotal').textContent = '₹' + t;
+    document.getElementById('cartTotalBtn').textContent = '₹' + t;
+
+    var pBtn = document.getElementById('placeBtn');
+    pBtn.disabled = c === 0;
+    pBtn.classList.toggle('opacity-40', c === 0);
+    pBtn.classList.toggle('cursor-not-allowed', c === 0);
+
+    var el = document.getElementById('cartItems');
+    if(c === 0){
+      el.innerHTML =
+        '<div class="text-center py-10 px-4 border border-dashed border-line rounded-2xl bg-paper/50">' +
+          '<div class="w-12 h-12 mx-auto rounded-full bg-surface border border-line grid place-items-center text-xl text-ink/40">🛒</div>' +
+          '<div class="mt-3 font-semibold text-sm">Your cart is empty</div>' +
+          '<p class="mt-1 text-xs text-ink/50 leading-relaxed">Add dishes from the menu — they\'ll show up here.</p>' +
+          '<button onclick="switchTab(\'menu\')" class="mt-3.5 text-xs font-semibold border border-ink px-4 py-2 rounded-full hover:bg-ink hover:text-white active:scale-95 transition">Browse menu</button>' +
+        '</div>';
+      return;
+    }
+    el.innerHTML = Object.entries(cart).map(function(entry){
+      var k = entry[0], i = entry[1];
+      return '<div class="flex items-center gap-3 border border-line rounded-xl px-3.5 py-2.5 bg-surface">' +
+        '<div class="flex-1 min-w-0">' +
+          '<div class="text-sm font-medium truncate">' + k + '</div>' +
+          '<div class="text-[11px] text-ink/50 tabular">₹' + i.p + ' × ' + i.q + '</div>' +
+        '</div>' +
+        '<div class="flex items-center gap-2 shrink-0">' +
+          '<button onclick="decItem(\'' + k + '\')" aria-label="Remove one" class="w-7 h-7 rounded-full border border-line grid place-items-center hover:border-ink/40 active:scale-90 transition">−</button>' +
+          '<span class="w-5 text-center font-bold tabular text-sm">' + i.q + '</span>' +
+          '<button onclick="incItem(\'' + k + '\')" aria-label="Add one" class="w-7 h-7 rounded-full bg-ink text-white grid place-items-center hover:opacity-90 active:scale-90 transition">+</button>' +
+        '</div>' +
+        '<div class="w-16 text-right text-sm font-bold tabular shrink-0">₹' + (i.p * i.q) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function placeOrder(){
+    if(!cartCount()) return toast('Cart is empty — add items from the Menu');
+    toast('Order placed — session locked');
+    setTimeout(function(){ switchTab('orders'); }, 600);
+  }
+
+  /* ── veg-only toggle ── */
+  function toggleVeg(){
+    var btn = document.getElementById('vegToggle');
+    var dot = document.getElementById('vegDot');
+    var inner = document.getElementById('vegDotInner');
+    var on = btn.classList.toggle('bg-ink');
+    btn.classList.toggle('text-white', on);
+    btn.classList.toggle('border-ink', on);
+    dot.classList.toggle('border-white', on);
+    dot.classList.toggle('border-ink', !on);
+    inner.classList.toggle('bg-white', on);
+    inner.classList.toggle('bg-ink', !on);
+    document.querySelectorAll('.nonveg-item').forEach(function(e){ e.style.display = on ? 'none' : 'flex'; });
+  }
+
+  /* ── variant bottom sheet ── */
+  function openVariant(){
+    var s = document.getElementById('variantSheet');
+    var p = document.getElementById('variantPanel');
+    var b = document.getElementById('variantBackdrop');
+    s.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function(){
+      p.classList.remove('translate-y-full');
+      b.classList.remove('opacity-0');
+    });
+  }
+  function closeVariant(){
+    var s = document.getElementById('variantSheet');
+    var p = document.getElementById('variantPanel');
+    var b = document.getElementById('variantBackdrop');
+    p.classList.add('translate-y-full');
+    b.classList.add('opacity-0');
+    document.body.style.overflow = '';
+    setTimeout(function(){ s.classList.add('hidden'); }, 200);
+  }
+  function pickVariant(el){
+    document.querySelectorAll('#variantSheet .vopt').forEach(function(o){
+      o.classList.remove('border-brand','bg-brand/5');
+      o.classList.add('border','border-line');
+    });
+    el.classList.remove('border','border-line');
+    el.classList.add('border-2','border-brand','bg-brand/5');
+    el.querySelector('input[type=radio]').checked = true;
+    var price = el.dataset.price, name = el.dataset.name;
+    var btn = document.getElementById('variantBtn');
+    btn.dataset.name = name;
+    btn.dataset.price = price;
+    btn.textContent = 'Add to order · ₹' + price;
+  }
+  function addVariant(){
+    var btn = document.getElementById('variantBtn');
+    addToCart(btn.dataset.name, Number(btn.dataset.price));
+    closeVariant();
+  }
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeVariant(); });
+
+  /* ── toast ── */
+  function toast(m){
+    var t = document.getElementById('toast');
+    t.textContent = m;
+    t.classList.remove('hidden');
+    t.classList.remove('toast-in'); void t.offsetWidth; t.classList.add('toast-in');
+    clearTimeout(t._id);
+    t._id = setTimeout(function(){ t.classList.add('hidden'); }, 2200);
+  }
+
+  /* ── init ── */
+  switchTab('menu');
+  renderCart();
+</script>
+</body>
+</html>
